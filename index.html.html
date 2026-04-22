@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>みんなの日本語 第21課 · 完全版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0b0e14;
+            font-family: 'Segoe UI', 'Noto Sans JP', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            color: #e8edf5;
+        }
+
+        .quiz-wrapper {
+            max-width: 950px;
+            width: 100%;
+            background: #1a1f2b;
+            border-radius: 36px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.03);
+            padding: 28px 30px 35px;
+            backdrop-filter: blur(2px);
+            position: relative;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-weight: 500;
+            font-size: 2.1rem;
+            letter-spacing: 1px;
+            color: #f2e9c2;
+            text-shadow: 0 2px 5px #00000030;
+        }
+
+        .vocab-quick-btn {
+            background: #3d5a73;
+            border: none;
+            border-bottom: 3px solid #1e2f3c;
+            color: #f0e7d2;
+            font-size: 1.3rem;
+            padding: 10px 22px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #1a2933;
+            font-weight: 600;
+            transition: 0.05s linear;
+        }
+        .vocab-quick-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #1a2933; }
+
+        .rule-banner {
+            background: linear-gradient(145deg, #d44c2e, #b33a1f);
+            color: #fff7e6;
+            text-align: center;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 0 #6e1f0e, 0 8px 12px black;
+            border-bottom: 2px solid #ffaa80;
+            text-shadow: 0 1px 3px black;
+        }
+
+        .progress-track {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .q-indicator {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: #252e3d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: #cdd9f0;
+            box-shadow: inset 0 2px 3px #00000055, 0 4px 6px #00000030;
+            cursor: pointer;
+            border: 1px solid #3f4a5c;
+            transition: 0.15s;
+            user-select: none;
+        }
+
+        .q-indicator.active {
+            border: 3px solid #f2c94c;
+            box-shadow: 0 0 12px #f2c94c66, inset 0 0 4px #fff3b0;
+            transform: scale(1.02);
+            background: #2f3b4e;
+        }
+
+        .q-indicator.answered {
+            background: #1e4a3b;
+            border-color: #3acf8e;
+            color: white;
+        }
+
+        .q-indicator.answered::after {
+            content: "✓";
+            font-weight: bold;
+            margin-left: 2px;
+            color: #a0f5c0;
+            font-size: 1.8rem;
+            line-height: 1;
+        }
+
+        .q-indicator.answered span {
+            display: none;
+        }
+
+        .q-indicator span {
+            display: block;
+        }
+
+        .question-panel {
+            background: #10151e;
+            border-radius: 28px;
+            padding: 32px 28px 24px;
+            margin-bottom: 28px;
+            border: 1px solid #364153;
+            box-shadow: inset 0 0 0 1px #2b3545, 0 12px 18px -8px black;
+        }
+
+        .sentence-box {
+            background: #1e2632;
+            padding: 30px 24px;
+            border-radius: 22px;
+            text-align: center;
+            font-size: 1.9rem;
+            font-weight: 500;
+            line-height: 1.6;
+            color: #f3e9d2;
+            box-shadow: inset 0 4px 8px #00000055, 0 2px 0 #3e4c5e;
+            border-bottom: 3px solid #596c84;
+            word-break: break-word;
+        }
+
+        .blank-highlight {
+            display: inline-block;
+            min-width: 140px;
+            background: #03060a;
+            border-radius: 20px;
+            padding: 0 16px;
+            margin: 0 4px;
+            color: #ffe5a3;
+            font-weight: 700;
+            border: 1px dashed #b9a87c;
+            box-shadow: inset 0 2px 5px black;
+        }
+
+        .answer-area {
+            margin-top: 28px;
+        }
+
+        .input-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .input-label {
+            background: #e5a811;
+            color: #0b0e14;
+            font-size: 1.4rem;
+            font-weight: 700;
+            padding: 8px 24px;
+            border-radius: 40px;
+            box-shadow: inset 0 -2px 0 #946b0a, 0 4px 8px black;
+            border-left: 4px solid #ffe79e;
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+
+        .hint-btn {
+            background: #3d4b5f;
+            border: none;
+            border-bottom: 3px solid #1e2733;
+            color: #f0e7d2;
+            font-size: 1.3rem;
+            padding: 10px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #151c26;
+            transition: 0.05s linear;
+            font-weight: 600;
+        }
+
+        .hint-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #151c26;
+        }
+
+        .hint-message {
+            margin-top: 8px;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            color: #ffdfa7;
+            background: #202b3a;
+            padding: 8px 22px;
+            border-radius: 40px;
+            display: inline-block;
+            border-left: 4px solid #f2c94c;
+            font-weight: 500;
+        }
+
+        .kana-input {
+            width: 100%;
+            padding: 18px 22px;
+            font-size: 2rem;
+            background: #0d121b;
+            border: 3px solid #e5a811;
+            border-radius: 60px;
+            color: #f2e3b0;
+            font-family: 'Noto Sans JP', 'Courier New', monospace;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: inset 0 5px 8px #00000070, 0 0 0 2px #e5a81140;
+        }
+
+        .kana-input:focus {
+            border-color: #f2c94c;
+            background: #121a25;
+            box-shadow: 0 0 20px #f2c94c80, inset 0 3px 8px black;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            background: #2e3b4e;
+            border: none;
+            border-bottom: 4px solid #10161e;
+            color: #f0e7d2;
+            font-size: 1.6rem;
+            font-weight: 600;
+            padding: 16px 10px;
+            border-radius: 80px;
+            cursor: pointer;
+            box-shadow: 0 7px 0 #0f151d, 0 4px 12px black;
+            transition: 0.08s linear;
+            text-align: center;
+            letter-spacing: 2px;
+            flex: 1;
+        }
+
+        .action-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 2px 0 #0f151d, 0 4px 10px black;
+        }
+
+        .back-btn {
+            background: #3f4352;
+        }
+
+        .results-container, .vocab-container {
+            background: #10171f;
+            border-radius: 28px;
+            padding: 24px 22px;
+            margin-top: 20px;
+            border: 1px solid #4f617a;
+        }
+
+        .score-header {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #fadf9e;
+        }
+
+        .result-item {
+            background: #1c2532;
+            border-radius: 18px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            border-left: 8px solid #3a4a5e;
+        }
+
+        .result-status {
+            font-size: 2rem;
+            min-width: 45px;
+        }
+
+        .correct-mark { color: #6fcf97; }
+        .wrong-mark { color: #e06f6f; }
+
+        .result-sentence {
+            flex: 1;
+            font-size: 1.3rem;
+            color: #d9e0ec;
+        }
+
+        .correct-answer-show {
+            color: #ffd966;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .restart-btn, .vocab-btn {
+            background: #3f4e64;
+            margin-top: 25px;
+            font-size: 1.5rem;
+            padding: 14px;
+            width: 100%;
+        }
+
+        .vocab-category {
+            margin-bottom: 30px;
+        }
+
+        .vocab-category h3 {
+            font-size: 1.8rem;
+            color: #f2c94c;
+            border-bottom: 2px solid #5f6f82;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .vocab-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1a2230;
+            border-radius: 16px;
+            overflow: hidden;
+            table-layout: fixed;
+        }
+
+        .vocab-table th, .vocab-table td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #2f3b4e;
+            vertical-align: middle;
+        }
+
+        .vocab-table th {
+            background: #263141;
+            color: #ffdfa7;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .vocab-table td {
+            color: #d9e0ec;
+        }
+
+        .star-cell {
+            text-align: center;
+            font-size: 2rem;
+            cursor: pointer;
+            user-select: none;
+            width: 60px;
+        }
+
+        .star-filled { color: #f5c542; }
+        .star-empty { color: #6a7a8e; }
+
+        .vocab-table th:nth-child(1) { width: 60px; }
+        .vocab-table th:nth-child(2) { width: 30%; }
+        .vocab-table th:nth-child(3) { width: 30%; }
+        .vocab-table th:nth-child(4) { width: auto; }
+
+        .back-to-test-btn {
+            background: #3f5e4c;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 1.5rem;
+            padding: 14px;
+        }
+
+        .hidden { display: none; }
+
+        .footer-note {
+            margin-top: 12px;
+            color: #7c8ba0;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="quiz-wrapper">
+    <div class="top-bar">
+        <h1>📘 みんなの日本語 第21課</h1>
+        <button class="vocab-quick-btn" id="quickVocabBtn">📖 単語帳</button>
+    </div>
+    <div class="rule-banner" id="ruleBanner">⚠️ 動詞は 普通形 で答えてください！ ⚠️</div>
+    <div class="progress-track" id="progressTrack"></div>
+
+    <!-- クイズエリア -->
+    <div id="quizArea">
+        <div class="question-panel">
+            <div class="sentence-box" id="sentenceDisplay"></div>
+            <div class="answer-area">
+                <div class="input-header">
+                    <span class="input-label">⌨️ ひらがな / カタカナ で入力</span>
+                    <button class="hint-btn" id="hintButton">💡 ヒント（詞性）</button>
+                </div>
+                <div id="hintDisplay" class="hint-message hidden"></div>
+                <input type="text" id="answerInput" class="kana-input" placeholder="ここに かいて" autocomplete="off" spellcheck="false">
+            </div>
+        </div>
+        <div class="action-row">
+            <button class="action-btn back-btn hidden" id="prevQuestionBtn">◀ 前の問題に戻る</button>
+            <button class="action-btn" id="nextOrCheckBtn">次の質問</button>
+        </div>
+        <div class="footer-note">🔹 動詞は普通形 · 右上の単語帳でいつでも復習</div>
+    </div>
+
+    <!-- 結果エリア -->
+    <div id="resultsArea" class="results-container hidden">
+        <div class="score-header" id="scoreDisplay">10問中 0 正解</div>
+        <div id="resultList"></div>
+        <button class="action-btn restart-btn" id="restartQuizBtn">↻ もう一度チャレンジ</button>
+        <button class="action-btn vocab-btn" id="showVocabListBtn">📚 単語リストを復習</button>
+    </div>
+
+    <!-- 単語リストエリア -->
+    <div id="vocabListArea" class="vocab-container hidden">
+        <h2 style="color:#f2c94c; text-align:center; margin-bottom:20px;">📖 第21課 単語リスト</h2>
+        <div id="vocabContent"></div>
+        <button class="action-btn back-to-test-btn" id="backToTestBtn">▶ テストに戻る</button>
+    </div>
+</div>
+
+<script>
+    (function(){
+        "use strict";
+
+        // ---------- データベース（完全版）----------
+        const VOCAB_DB = [
+            { pos: '動詞', kanji: '思います', kana: 'おもいます', en: 'to think', sentences: [
+                { sentence: 'この漫画はとても面白いと（ [_____] ）。', answer: 'おもう' },
+                { sentence: '明日は雨が降ると（ [_____] ）。', answer: 'おもう' },
+                { sentence: 'ミラさんは親切だと（ [_____] ）。', answer: 'おもう' }
+            ]},
+            { pos: '動詞', kanji: '言います', kana: 'いいます', en: 'to say', sentences: [
+                { sentence: '今朝、彼は「わからない」と（ [_____] ）。', answer: 'いった' },
+                { sentence: 'そんなひどいことは（ [_____] ）でください。', answer: 'いわない' },
+                { sentence: '授業で、先生は試験について大切なことを（ [_____] ）。', answer: 'いった' }
+            ]},
+            { pos: '動詞', kanji: '勝ちます', kana: 'かちます', en: 'to win', sentences: [
+                { sentence: '私たちのチームは昨日の試合に（ [_____] ）。', answer: 'かった' },
+                { sentence: '努力しなければ（ [_____] ）。', answer: 'かたない' },
+                { sentence: '彼は天才だから、いつも簡単に（ [_____] ）ことができます。', answer: 'かつ' }
+            ]},
+            { pos: '動詞', kanji: '負けます', kana: 'まけます', en: 'to lose', sentences: [
+                { sentence: '残念ですが、先月の試合で我々は（ [_____] ）。', answer: 'まけた' },
+                { sentence: 'どんなに強くても絶対に（ [_____] ）。', answer: 'まけない' },
+                { sentence: '試合に（ [_____] ）ことも成長のチャンスだ。', answer: 'まける' }
+            ]},
+            { pos: '動詞', kanji: 'あります', kana: 'あります', en: 'to be held', sentences: [
+                { sentence: '来週、駅前でお祭りが（ [_____] ）。', answer: 'ある' },
+                { sentence: '明日は授業が（ [_____] ）から、家で勉強する。', answer: 'ない' },
+                { sentence: '毎年この公園で花火大会が（ [_____] ）。', answer: 'ある' },
+                { sentence: '先週、ここでライブが（ [_____] ）。', answer: 'あった' }
+            ]},
+            { pos: '動詞', kanji: '役に立ちます', kana: 'やくにたちます', en: 'to be useful', sentences: [
+                { sentence: 'このアプリは勉強に（ [_____] ）。', answer: 'やくにたつ' },
+                { sentence: '古い情報は（ [_____] ）から、新しいデータを探してください。', answer: 'やくにたたない' },
+                { sentence: 'どんな経験もいつか（ [_____] ）。', answer: 'やくにたつ' },
+                { sentence: 'この辞書は漢字の学習に（ [_____] ）。', answer: 'やくにたつ' }
+            ]},
+            { pos: '動詞', kanji: '動きます', kana: 'うごきます', en: 'to move', sentences: [
+                { sentence: 'このロボットは声で（ [_____] ）。', answer: 'うごく' },
+                { sentence: '昨日、エンジンが故障して（ [_____] ）。', answer: 'うごかなかった' },
+                { sentence: '時計の針が静かに（ [_____] ）。', answer: 'うごく' },
+                { sentence: '最近、パソコンの動作が遅くて（ [_____] ）。', answer: 'うごかない' }
+            ]},
+            { pos: '動詞', kanji: '辞めます', kana: 'やめます', en: 'to quit', sentences: [
+                { sentence: '去年の11月、彼は会社を（ [_____] ）。今も無職だ。', answer: 'やめた' },
+                { sentence: '体に良くないから、タバコを（ [_____] ）もいいですか。', answer: 'やめて' }
+            ]},
+            { pos: '動詞', kanji: '気を付けます', kana: 'きをつけます', en: 'to take care', sentences: [
+                { sentence: 'よく（ [_____] ）運転してください。', answer: 'きをつけて' },
+                { sentence: '健康に（ [_____] ）ことが大切だ。', answer: 'きをつける' },
+                { sentence: '試験中は時間にも（ [_____] ）ください。', answer: 'きをつけて' }
+            ]},
+            { pos: '動詞', kanji: '留学します', kana: 'りゅうがくします', en: 'to study abroad', sentences: [
+                { sentence: '来年、カナダに（ [_____] ）。', answer: 'りゅうがくする' },
+                { sentence: '去年、彼女は日本に（ [_____] ）。', answer: 'りゅうがくした' }
+            ]},
+            { pos: '名詞', kanji: '漫画', kana: 'まんが', en: 'comic', sentences: [
+                { sentence: '弟の本棚は、全部（ [_____] ）です。', answer: 'まんが' },
+                { sentence: '私は未来に自分の（ [_____] ）を描きたいです。', answer: 'まんが' }
+            ]},
+            { pos: '名詞', kanji: '本当', kana: 'ほんとう', en: 'true', sentences: [
+                { sentence: 'それは（ [_____] ）の話ですか。', answer: 'ほんとう' },
+                { sentence: '彼が言ったことは（ [_____] ）ではないと思います。', answer: 'ほんとう' }
+            ]},
+            { pos: '名詞', kanji: '嘘', kana: 'うそ', en: 'lie', sentences: [
+                { sentence: '彼はよく（ [_____] ）をつく。', answer: 'うそ' },
+                { sentence: '（ [_____] ）は絶対に言わない。', answer: 'うそ' }
+            ]},
+            { pos: '名詞', kanji: '自動車', kana: 'じどうしゃ', en: 'car', sentences: [
+                { sentence: '父は毎日（ [_____] ）会社で働いている。', answer: 'じどうしゃ' }
+            ]},
+            { pos: '名詞', kanji: '交通', kana: 'こうつう', en: 'traffic', sentences: [
+                { sentence: '東京の（ [_____] ）はとても便利だ。', answer: 'こうつう' }
+            ]},
+            { pos: '名詞', kanji: '物価', kana: 'ぶっか', en: 'prices', sentences: [
+                { sentence: '最近（ [_____] ）が上がっている。', answer: 'ぶっか' }
+            ]},
+            { pos: '名詞', kanji: '放送', kana: 'ほうそう', en: 'broadcast', sentences: [
+                { sentence: 'このラジオ（ [_____] ）は毎日聞いている。', answer: 'ほうそう' }
+            ]},
+            { pos: '名詞', kanji: '夢', kana: 'ゆめ', en: 'dream', sentences: [
+                { sentence: '昨夜、怖い（ [_____] ）を見た。', answer: 'ゆめ' }
+            ]},
+            { pos: '名詞', kanji: '天才', kana: 'てんさい', en: 'genius', sentences: [
+                { sentence: '彼はピアノの（ [_____] ）だ。', answer: 'てんさい' }
+            ]},
+            { pos: '名詞', kanji: '試合', kana: 'しあい', en: 'match', sentences: [
+                { sentence: '明日、大事な野球の（ [_____] ）がある。', answer: 'しあい' }
+            ]},
+            { pos: '名詞', kanji: '意見', kana: 'いけん', en: 'opinion', sentences: [
+                { sentence: '私はそれに反対の（ [_____] ）です。', answer: 'いけん' }
+            ]},
+            { pos: '名詞', kanji: '話', kana: 'はなし', en: 'story', sentences: [
+                { sentence: '面白い（ [_____] ）をありがとう。', answer: 'はなし' }
+            ]},
+            { pos: '名詞', kanji: '地球', kana: 'ちきゅう', en: 'Earth', sentences: [
+                { sentence: '（ [_____] ）は温暖化の問題があります。', answer: 'ちきゅう' }
+            ]},
+            { pos: '名詞', kanji: '月', kana: 'つき', en: 'moon', sentences: [
+                { sentence: '今夜の（ [_____] ）はとてもきれいだ。', answer: 'つき' }
+            ]},
+            { pos: 'な形容詞', kanji: '無駄', kana: 'むだ', en: 'wasteful', sentences: [
+                { sentence: '時間を（ [_____] ）にしないで。', answer: 'むだ' }
+            ]},
+            { pos: 'な形容詞', kanji: '不便', kana: 'ふべん', en: 'inconvenient', sentences: [
+                { sentence: 'この辺りはバスが少なくて（ [_____] ）だ。', answer: 'ふべん' }
+            ]},
+            { pos: 'い形容詞', kanji: '凄い', kana: 'すごい', en: 'great', sentences: [
+                { sentence: 'このアニメの絵は（ [_____] ）です。', answer: 'すごい' }
+            ]},
+            { pos: '副詞', kanji: '最近', kana: 'さいきん', en: 'recently', sentences: [
+                { sentence: '（ [_____] ）、忙しくて友達に会えない。', answer: 'さいきん' }
+            ]},
+            { pos: '副詞', kanji: '多分', kana: 'たぶん', en: 'probably', sentences: [
+                { sentence: '明日は（ [_____] ）雨が降る。', answer: 'たぶん' }
+            ]},
+            { pos: '副詞', kanji: '', kana: 'きっと', en: 'surely', sentences: [
+                { sentence: '明日は（ [_____] ）晴れる。', answer: 'きっと' }
+            ]},
+            { pos: '副詞', kanji: '', kana: 'そんなに', en: 'not so', sentences: [
+                { sentence: 'この本は（ [_____] ）面白くない。', answer: 'そんなに' }
+            ]},
+            { pos: '副詞', kanji: '本当に', kana: 'ほんとうに', en: 'really', sentences: [
+                { sentence: 'その話は（ [_____] ）面白かった。', answer: 'ほんとうに' }
+            ]},
+            { pos: 'その他', kanji: 'について', kana: 'について', en: 'about', sentences: [
+                { sentence: '日本の文化（ [_____] ）話しましょう。', answer: 'について' }
+            ]},
+            { pos: '外来語', kanji: '', kana: 'ニュース', en: 'news', sentences: [
+                { sentence: '今朝、（ [_____] ）で事故を知った。', answer: 'ニュース' }
+            ]},
+            { pos: '外来語', kanji: '', kana: 'アニメ', en: 'anime', sentences: [
+                { sentence: '私は毎週新しい（ [_____] ）を見る。', answer: 'アニメ' }
+            ]},
+            { pos: '外来語', kanji: '', kana: 'デザイン', en: 'design', sentences: [
+                { sentence: 'この車の（ [_____] ）が好きだ。', answer: 'デザイン' }
+            ]}
+        ];
+
+        // グローバル状態
+        let currentQuestions = [];
+        let userAnswers = new Array(10).fill('');
+        let currentIndex = 0;
+        let quizFinished = false;
+        const starredSet = new Set();
+
+        const progressTrack = document.getElementById('progressTrack');
+        const ruleBanner = document.getElementById('ruleBanner');
+        const sentenceDisplay = document.getElementById('sentenceDisplay');
+        const answerInput = document.getElementById('answerInput');
+        const nextOrCheckBtn = document.getElementById('nextOrCheckBtn');
+        const prevQuestionBtn = document.getElementById('prevQuestionBtn');
+        const quizArea = document.getElementById('quizArea');
+        const resultsArea = document.getElementById('resultsArea');
+        const vocabListArea = document.getElementById('vocabListArea');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const resultList = document.getElementById('resultList');
+        const restartBtn = document.getElementById('restartQuizBtn');
+        const showVocabListBtn = document.getElementById('showVocabListBtn');
+        const quickVocabBtn = document.getElementById('quickVocabBtn');
+        const backToTestBtn = document.getElementById('backToTestBtn');
+        const hintButton = document.getElementById('hintButton');
+        const hintDisplay = document.getElementById('hintDisplay');
+
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function generateQuiz() {
+            const shuffled = shuffle([...VOCAB_DB]);
+            const selected = shuffled.slice(0, 10);
+            return shuffle(selected.map(v => {
+                const rand = Math.floor(Math.random() * v.sentences.length);
+                return { sentence: v.sentences[rand].sentence, answer: v.sentences[rand].answer, pos: v.pos };
+            }));
+        }
+
+        function initQuiz() {
+            currentQuestions = generateQuiz();
+            userAnswers = new Array(10).fill('');
+            currentIndex = 0;
+            quizFinished = false;
+            quizArea.classList.remove('hidden');
+            resultsArea.classList.add('hidden');
+            vocabListArea.classList.add('hidden');
+            hintDisplay.classList.add('hidden');
+            // 表示横幅和进度条
+            ruleBanner.classList.remove('hidden');
+            progressTrack.classList.remove('hidden');
+            quickVocabBtn.classList.remove('hidden');
+            renderProgressIndicators();
+            renderQuestionByIndex(currentIndex);
+            updateButtons();
+            answerInput.focus();
+        }
+
+        function renderProgressIndicators() {
+            progressTrack.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                const ind = document.createElement('div');
+                ind.className = 'q-indicator';
+                if (i === currentIndex && !quizFinished) ind.classList.add('active');
+                if (userAnswers[i].trim() !== '') ind.classList.add('answered');
+                const span = document.createElement('span');
+                span.textContent = i + 1;
+                ind.appendChild(span);
+                ind.addEventListener('click', () => {
+                    if (quizFinished) return;
+                    saveCurrentAnswer();
+                    currentIndex = i;
+                    renderQuestionByIndex(currentIndex);
+                    updateButtons();
+                    renderProgressIndicators();
+                    hintDisplay.classList.add('hidden');
+                    answerInput.focus();
+                });
+                progressTrack.appendChild(ind);
+            }
+        }
+
+        function saveCurrentAnswer() {
+            if (!quizFinished && currentIndex >= 0 && currentIndex < 10) {
+                userAnswers[currentIndex] = answerInput.value.trim();
+            }
+        }
+
+        function renderQuestionByIndex(index) {
+            const q = currentQuestions[index];
+            sentenceDisplay.innerHTML = q.sentence.replace(/\[_____\]/g, '<span class="blank-highlight">＿＿＿</span>');
+            answerInput.value = userAnswers[index] || '';
+        }
+
+        function updateButtons() {
+            nextOrCheckBtn.textContent = currentIndex === 9 ? 'チェック' : '次の質問';
+            prevQuestionBtn.classList.toggle('hidden', currentIndex === 0 || quizFinished);
+        }
+
+        function showHint() {
+            if (quizFinished) return;
+            hintDisplay.textContent = `🔍 詞性： ${currentQuestions[currentIndex].pos}`;
+            hintDisplay.classList.remove('hidden');
+        }
+
+        function goToPrev() {
+            if (quizFinished || currentIndex <= 0) return;
+            saveCurrentAnswer();
+            currentIndex--;
+            renderQuestionByIndex(currentIndex);
+            updateButtons();
+            renderProgressIndicators();
+            hintDisplay.classList.add('hidden');
+            answerInput.focus();
+        }
+
+        function handleNextOrCheck() {
+            if (quizFinished) return;
+            saveCurrentAnswer();
+            if (currentIndex === 9) {
+                finishAndShowResults();
+                return;
+            }
+            currentIndex++;
+            renderQuestionByIndex(currentIndex);
+            updateButtons();
+            renderProgressIndicators();
+            hintDisplay.classList.add('hidden');
+            answerInput.focus();
+        }
+
+        function finishAndShowResults() {
+            quizFinished = true;
+            let correct = 0;
+            const items = [];
+            currentQuestions.forEach((q, i) => {
+                const ans = userAnswers[i] || '';
+                const ok = ans === q.answer;
+                if (ok) correct++;
+                const icon = ok ? '✅' : '❌';
+                const cls = ok ? 'correct-mark' : 'wrong-mark';
+                const disp = q.sentence.replace(/\[_____\]/g, '<span style="background:#1e3a4d; padding:2px 10px; border-radius:30px;">＿＿＿</span>');
+                const extra = !ok ? `<span class="correct-answer-show"> (正解: ${q.answer})</span>` : '';
+                items.push(`<div class="result-item"><div class="result-status ${cls}">${icon}</div><div class="result-sentence">${disp}<div>あなたの答え: <strong>${ans||'（未入力）'}</strong> ${extra}</div></div></div>`);
+            });
+            scoreDisplay.textContent = `10問中 ${correct} 正解`;
+            resultList.innerHTML = items.join('');
+            quizArea.classList.add('hidden');
+            resultsArea.classList.remove('hidden');
+            vocabListArea.classList.add('hidden');
+            // 结果页显示横幅和进度条（但结果页不需要进度条，我们隐藏进度条，保留横幅？ 按用户要求，仅词汇表页面隐藏，测试页/结果页正常显示）
+            ruleBanner.classList.remove('hidden');
+            progressTrack.classList.remove('hidden');
+            quickVocabBtn.classList.remove('hidden');
+            renderProgressIndicators();
+        }
+
+        function buildVocabList() {
+            const categories = { '動詞':[], '名詞':[], 'い形容詞':[], 'な形容詞':[], '副詞':[], 'その他':[], '外来語':[] };
+            const seen = new Set();
+            VOCAB_DB.forEach(v => {
+                if (seen.has(v.kana)) return;
+                seen.add(v.kana);
+                if (categories[v.pos]) categories[v.pos].push(v);
+                else categories['その他'].push(v);
+            });
+            let html = '';
+            for (let cat in categories) {
+                if (!categories[cat].length) continue;
+                html += `<div class="vocab-category"><h3>📌 ${cat}</h3><table class="vocab-table"><tr><th></th><th>ひらがな/カタカナ</th><th>漢字</th><th>英語</th></tr>`;
+                categories[cat].forEach(v => {
+                    const key = v.kana;
+                    const starred = starredSet.has(key);
+                    const starChar = starred ? '★' : '☆';
+                    const starClass = starred ? 'star-filled' : 'star-empty';
+                    html += `<tr><td class="star-cell ${starClass}" data-kana="${key}">${starChar}</td><td>${v.kana}</td><td>${v.kanji || ''}</td><td>${v.en}</td></tr>`;
+                });
+                html += `</table></div>`;
+            }
+            document.getElementById('vocabContent').innerHTML = html;
+            document.querySelectorAll('.star-cell').forEach(cell => {
+                cell.addEventListener('click', function() {
+                    const kana = this.dataset.kana;
+                    if (starredSet.has(kana)) {
+                        starredSet.delete(kana);
+                        this.textContent = '☆';
+                        this.classList.remove('star-filled');
+                        this.classList.add('star-empty');
+                    } else {
+                        starredSet.add(kana);
+                        this.textContent = '★';
+                        this.classList.add('star-filled');
+                        this.classList.remove('star-empty');
+                    }
+                });
+            });
+        }
+
+        function showVocabPanel() {
+            buildVocabList();
+            quizArea.classList.add('hidden');
+            resultsArea.classList.add('hidden');
+            vocabListArea.classList.remove('hidden');
+            // 隐藏横幅、进度条、快速按钮
+            ruleBanner.classList.add('hidden');
+            progressTrack.classList.add('hidden');
+            quickVocabBtn.classList.add('hidden');
+        }
+
+        function hideVocabAndReturn() {
+            vocabListArea.classList.add('hidden');
+            // 恢复显示
+            ruleBanner.classList.remove('hidden');
+            progressTrack.classList.remove('hidden');
+            quickVocabBtn.classList.remove('hidden');
+            if (quizFinished) {
+                resultsArea.classList.remove('hidden');
+            } else {
+                quizArea.classList.remove('hidden');
+                answerInput.focus();
+            }
+        }
+
+        answerInput.addEventListener('input', function() {
+            if (quizFinished) return;
+            userAnswers[currentIndex] = this.value.trim();
+            renderProgressIndicators();
+        });
+
+        nextOrCheckBtn.addEventListener('click', handleNextOrCheck);
+        prevQuestionBtn.addEventListener('click', goToPrev);
+        hintButton.addEventListener('click', showHint);
+        restartBtn.addEventListener('click', initQuiz);
+        showVocabListBtn.addEventListener('click', showVocabPanel);
+        quickVocabBtn.addEventListener('click', showVocabPanel);
+        backToTestBtn.addEventListener('click', hideVocabAndReturn);
+        answerInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !quizFinished) { e.preventDefault(); handleNextOrCheck(); }});
+
+        initQuiz();
+        window.addEventListener('load', ()=> answerInput.focus());
+    })();
+</script>
+</body>
+</html>
